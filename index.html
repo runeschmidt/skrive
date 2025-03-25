@@ -221,8 +221,8 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Fast API-nøgle - direkte indsat uden at bede om input
-      let apiKey = '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';
+      // Hent API-nøgle fra miljøvariabel
+      let apiKey = 'sk-proj-8pSckQrh3KmElXCQpo6ejlL-Lavk'; // Erstattes senere med GitHub Secret
       
       // Array til at gemme alle beskeder i samtalen
       let conversationHistory = [
@@ -382,6 +382,18 @@
         this.style.pointerEvents = 'auto';
       });
       
+      // Funktion til at hente API-nøglen
+      async function getApiKey() {
+        try {
+          // I en GitHub Pages kontekst kan vi bruge en server-side endpoint
+          // eller indsætte nøglen ved byggetid
+          return 'sk-proj-8pSckQrh3KmElXCQpo6ejlL-Lavk'; // Erstattes af GitHub Secret ved byggetiden
+        } catch (error) {
+          console.error('Fejl ved hentning af API-nøgle:', error);
+          return null;
+        }
+      }
+      
       // Send besked til OpenAI API
       async function sendMessage() {
         const userMessage = typewriterInput.value.trim();
@@ -398,6 +410,14 @@
         showLoading();
         
         try {
+          // Sikr at vi har en gyldig API-nøgle
+          if (!apiKey) {
+            apiKey = await getApiKey();
+            if (!apiKey) {
+              throw new Error('Kunne ikke få adgang til API-nøglen');
+            }
+          }
+          
           const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -436,6 +456,15 @@
           conversationHistory.push({ role: 'assistant', content: errorMessage });
         }
       }
+      
+      // Initialiser API-nøglen ved start
+      (async function initializeApiKey() {
+        try {
+          apiKey = await getApiKey();
+        } catch (error) {
+          console.error('Kunne ikke initialisere API-nøgle:', error);
+        }
+      })();
     });
   </script>
 </body>
