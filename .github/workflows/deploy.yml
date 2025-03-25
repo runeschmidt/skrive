@@ -1,0 +1,24 @@
+name: Deploy Skrivemaskine App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+
+      - name: Replace API Key 🔑
+        run: |
+          sed -i "s/sk-proj-8pSckQrh3KmElXCQpo6ejlL-Lavk/${{ secrets.KEY }}/" index.html
+        shell: bash
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: . # Mappe, der skal deployes
+          branch: gh-pages # Den gren hvor applikationen skal deployes
